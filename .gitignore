@@ -1,0 +1,6 @@
+Win7Debug/
+Debug/
+Release/
+Win7Release/
+*.suo
+*.sdf

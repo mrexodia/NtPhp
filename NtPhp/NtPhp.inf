@@ -1,0 +1,91 @@
+;
+; NtPhp.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=NtPhp.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+NtPhp.sys  = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%NtPhp.DeviceDesc%=NtPhp_Device, Root\NtPhp ; TODO: edit hw-id
+
+[NtPhp_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+NtPhp.sys
+
+;-------------- Service installation
+[NtPhp_Device.NT.Services]
+AddService = NtPhp,%SPSVCINST_ASSOCSERVICE%, NtPhp_Service_Inst
+
+; -------------- NtPhp driver install sections
+[NtPhp_Service_Inst]
+DisplayName    = %NtPhp.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\NtPhp.sys
+LoadOrderGroup = Extended Base
+
+;
+;--- NtPhp_Device Coinstaller installation ------
+;
+
+[DestinationDirs]
+NtPhp_Device_CoInstaller_CopyFiles = 11
+
+[NtPhp_Device.NT.CoInstallers]
+AddReg=NtPhp_Device_CoInstaller_AddReg
+CopyFiles=NtPhp_Device_CoInstaller_CopyFiles
+
+[NtPhp_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[NtPhp_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[SourceDisksFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+[NtPhp_Device.NT.Wdf]
+KmdfService =  NtPhp, NtPhp_wdfsect
+[NtPhp_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="" ; TODO: add ManufacturerName
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "NtPhp Installation Disk"
+NtPhp.DeviceDesc = "NtPhp Device"
+NtPhp.SVCDESC = "NtPhp Service"
